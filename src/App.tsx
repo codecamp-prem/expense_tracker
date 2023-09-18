@@ -36,23 +36,17 @@
 // }
 import { useEffect, useState } from "react";
 import apiClient, { CanceledError } from "./services/api-client";
+import UserService, { User } from "./services/user-service";
 
-interface User {
-  id: number;
-  name: string;
-}
 function App() {
   const [users, setUsers] = useState<User[]>([]);
   const [error, setError] = useState<string>("");
   const [isLoading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
-    const controller = new AbortController();
     setLoading(true);
-    apiClient
-      .get<User[]>("/users", {
-        signal: controller.signal,
-      })
+    const { request, cancel } = UserService.getAllUsers();
+    request
       .then((res) => {
         setUsers(res.data);
         setLoading(false);
@@ -69,7 +63,7 @@ function App() {
     //setLoading(false);
     //});
 
-    return () => controller.abort();
+    return () => cancel();
   }, []);
 
   const deleteUser = (user: User) => {
@@ -77,7 +71,8 @@ function App() {
     //optimistic update
     setUsers(users.filter((u) => u.id !== user.id));
 
-    apiClient.delete("/users/" + user.id).catch((err) => {
+    const { delete_request } = UserService.deleteUser(user.id);
+    delete_request.catch((err) => {
       setError(err.message);
       setUsers(originalUsers);
     });
@@ -90,8 +85,8 @@ function App() {
     // Again Optimistic update
     setUsers([newUser, ...users]);
 
-    apiClient
-      .post("/users/", newUser)
+    const { add_request } = UserService.addUser(newUser);
+    add_request
       .then(({ data: savedUser }) => setUsers([savedUser, ...users]))
       .catch((err) => {
         setError(err.message);
@@ -105,7 +100,8 @@ function App() {
     const updated_User = { ...user, name: user.name + "!" };
     setUsers(users.map((u) => (u.id === user.id ? updated_User : u)));
 
-    apiClient.patch("/users/" + user.id, updated_User).catch((err) => {
+    const { update_request } = UserService.updateUser(user.id, updated_User);
+    update_request.catch((err) => {
       setError(err.message);
       setUsers(originalUsers);
     });
