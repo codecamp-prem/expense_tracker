@@ -1,7 +1,7 @@
 import { FieldValues, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { categories } from "../App";
+import categories from "../models/categories";
 
 const schema = z.object({
   description: z
@@ -10,11 +10,9 @@ const schema = z.object({
   amount: z
     .number({ invalid_type_error: "Amount field is required." })
     .min(1, { message: "Amount must be greater than or equal to 1" }),
-  category: z
-    .string({
-      invalid_type_error: "Category field is required",
-    })
-    .min(1, { message: "Category is required" }),
+  category: z.enum(categories, {
+    errorMap: () => ({ message: "Category is required" }),
+  }),
 });
 
 type formData = z.infer<typeof schema>;

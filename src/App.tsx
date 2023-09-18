@@ -3,8 +3,6 @@ import { ExpenseDashBoard } from "./ExpenseDashBoard";
 import ExpenseForm from "./Forms/ExpenseForm";
 import ExpenseType from "./models/ExpenseType";
 
-export const categories = ["Groceries", "Utilities", "Entertainment"];
-
 function App() {
   const [lists, setLists] = useState<ExpenseType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -18,7 +16,6 @@ function App() {
   };
 
   const filterCategory = (category: string) => {
-    console.log(category);
     setSelectedCategory(category);
   };
 
