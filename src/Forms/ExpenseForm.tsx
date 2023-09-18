@@ -1,9 +1,11 @@
-import { FieldValues, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import categories from "../models/categories";
+import ExpenseType from "../models/ExpenseType";
 
 const schema = z.object({
+  id: z.string(),
   description: z
     .string()
     .min(3, { message: "Description must be at least 3 character(s)" }),
@@ -18,9 +20,11 @@ const schema = z.object({
 type formData = z.infer<typeof schema>;
 
 interface Props {
-  addExpense: (newItem: {}) => void;
+  addExpense: (newItem: ExpenseType) => void;
 }
+
 const ExpenseForm = ({ addExpense }: Props) => {
+  let id = crypto.randomUUID().toString();
   const {
     register,
     handleSubmit,
@@ -28,9 +32,8 @@ const ExpenseForm = ({ addExpense }: Props) => {
     formState: { errors, isValid },
   } = useForm<formData>({ resolver: zodResolver(schema) });
 
-  const onSubmit = (data: FieldValues) => {
-    let id = crypto.randomUUID().toString();
-    addExpense({ id, ...data });
+  const onSubmit = (data: ExpenseType) => {
+    addExpense(data);
   };
 
   return (
@@ -41,6 +44,7 @@ const ExpenseForm = ({ addExpense }: Props) => {
           reset();
         })}
       >
+        <input type="hidden" {...register("id")} defaultValue={id} />
         <div className="mb-3">
           <label htmlFor="description" className="form-label">
             Description

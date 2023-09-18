@@ -7,7 +7,7 @@ function App() {
   const [lists, setLists] = useState<ExpenseType[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const onAddNewExpense = (newItem: {}) => {
+  const onAddNewExpense = (newItem: ExpenseType) => {
     setLists([...lists, newItem]);
   };
 
